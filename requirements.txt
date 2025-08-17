@@ -1,0 +1,3 @@
+aiogram
+pytest
+psycopg2-binary
