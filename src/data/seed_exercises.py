@@ -1,16 +1,15 @@
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import declarative_base
+from src.models.exercise import Exercise
 
-Base = declarative_base()
+INITIAL_EXERCISES = [
+    {"name": "Bench Press", "category": "Chest", "primary_muscle": "Pectorals"},
+    {"name": "Squat", "category": "Legs", "primary_muscle": "Quadriceps"},
+    {"name": "Deadlift", "category": "Back", "primary_muscle": "Erector Spinae"},
+    {"name": "Overhead Press", "category": "Shoulders", "primary_muscle": "Deltoids"},
+    {"name": "Pull-Up", "category": "Back", "primary_muscle": "Latissimus Dorsi"},
+]
 
-class Exercise(Base):
-    __tablename__ = "exercises"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(200), nullable=False)
-    category = Column(String(100))
-    primary_muscle = Column(String(100))
-
-    def __repr__(self):
-        return f"<Exercise(name={self.name}, category={self.category}, muscle={self.primary_muscle})>"
-        
+def seed_exercises(session):
+    for exercise_data in INITIAL_EXERCISES:
+        exercise = Exercise(**exercise_data)
+        session.add(exercise)
+    session.commit()
