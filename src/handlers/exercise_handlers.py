@@ -15,13 +15,16 @@ PAGE_SIZE = 5
 # /exercises 
 #===============
 
+def format_exercise(ex):
+    return f"🏋️ {ex.name}\n📂 Категория: {ex.category}\n💪 Мышца: {ex.primary_muscle}\n"
+
 def get_exercise_page(session, page=0):
     exercises = list_exercises(session)
     start = page * PAGE_SIZE
     end = start + PAGE_SIZE
     chunk = exercises[start:end]
 
-    text = "\n".join([f"{ex.id}. {ex.name} ({ex.category})" for ex in chunk]) or "Нет упражнений"
+    text = "\n\n".join([format_exercise(ex) for ex in chunk]) or "Нет упражнений"
     
     keyboard = InlineKeyboardMarkup(inline_keyboard=[
         [
@@ -30,6 +33,7 @@ def get_exercise_page(session, page=0):
         ]
     ])
     return text, keyboard
+
 
 @router.message(F.text == "/exercises")
 async def show_exercises(message: Message, session):
