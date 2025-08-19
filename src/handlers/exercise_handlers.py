@@ -4,15 +4,16 @@ from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from src.services.exercise_service import list_exercises, find_exercises_by_name
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 router = Router()
 logger = logging.getLogger(__name__)
 
 PAGE_SIZE = 5
 
-# ======================
+#===============
 # /exercises 
-# ======================
+#===============
 
 def get_exercise_page(session, page=0):
     exercises = list_exercises(session)
@@ -38,7 +39,7 @@ async def show_exercises(message: Message, session):
 
 # ======================
 # /search_exercise
-# ======================
+#====================
 
 class SearchExercise(StatesGroup):
     waiting_for_name = State()
@@ -68,3 +69,34 @@ async def process_search(message: Message, state: FSMContext, session):
 
     await message.answer(text)
     await state.clear()
+
+#==============
+# /categories
+# ==============
+@router.message(F.text == "/categories")
+async def show_categories(message: Message, session):
+    exercises = list_exercises(session)
+    categories = sorted(set(ex.category for ex in exercises if ex.category))
+
+    if not categories:
+        await message.answer("Категории не найдены.")
+        return
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text=c)] for c in categories],
+        resize_keyboard=True
+    )
+    await message.answer("Выберите категорию:", reply_markup=keyboard)
+
+@router.message()
+async def handle_category_choice(message: Message, session):
+    category = message.text.strip()
+    exercises = list_exercises(session)
+    filtered = [ex for ex in exercises if ex.category == category]
+
+    if filtered:
+        text = "\n".join([f"{ex.name} — {ex.primary_muscle}" for ex in filtered])
+    else:
+        text = "В этой категории пока нет упражнений."
+
+    await message.answer(text, reply_markup=None) 
