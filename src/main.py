@@ -1,36 +1,46 @@
-# src/main.py
-import asyncio
-import os
-from dotenv import load_dotenv
+﻿import asyncio
+import logging
 from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
 from src.handlers.exercise_handlers import router
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from src.models.exercise import Base
+from environs import Env
 from src.data.seed_exercises import seed_exercises
 
-load_dotenv()
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+# Настройка логирования
+logging.basicConfig(level=logging.DEBUG)
 
-engine = create_engine("sqlite:///exercises.db")
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = Session()
+# Загрузка переменных окружения
+env = Env()
+env.read_env()
+BOT_TOKEN = env.str('TELEGRAM_TOKEN')
 
-if not session.query(Base.metadata.tables['exercises']).count():
-    seed_exercises(session)
+# Настройка базы данных
+engine = create_async_engine('sqlite+aiosqlite:///database.db', echo=True)
+async_session = async_sessionmaker(engine, expire_on_commit=False)
 
+# Middleware для передачи сессии
+class DatabaseSessionMiddleware:
+    def __init__(self, session_pool):
+        self.session_pool = session_pool
+
+    async def __call__(self, handler, event, data):
+        async with self.session_pool() as session:
+            data['session'] = session
+            return await handler(event, data)
+
+# Инициализация бота
+bot = Bot(token=BOT_TOKEN)
+dp = Dispatcher()
+dp.update.outer_middleware(DatabaseSessionMiddleware(async_session))
+dp.include_router(router)
+
+# Запуск бота
 async def main():
-    bot = Bot(token=TOKEN)
-    storage = MemoryStorage()
-    dp = Dispatcher(storage=storage)
+    # Инициализация базы данных
+    async with async_session() as session:
+        async with session.begin():
+            await seed_exercises(session)
+    await dp.start_polling(bot, polling_timeout=15)
 
-    dp.include_router(router)
-
-    print("Bot is running...")
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     asyncio.run(main())

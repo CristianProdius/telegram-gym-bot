@@ -1,10 +1,13 @@
-from sqlalchemy.orm import Session
+﻿from sqlalchemy.ext.asyncio import AsyncSession
 from src.models.exercise import Exercise
+from sqlalchemy.future import select
 
-def list_exercises(session: Session):
-    return session.query(Exercise).all()
+async def list_exercises(session: AsyncSession):
+    result = await session.execute(select(Exercise))
+    return result.scalars().all()
 
-def find_exercises_by_name(session: Session, query: str):
-    return session.query(Exercise).filter(
-        Exercise.name.ilike(f"%{query}%")
-    ).all()
+async def find_exercises_by_name(session: AsyncSession, query: str):
+    result = await session.execute(
+        select(Exercise).filter(Exercise.name.ilike(f'%{query}%'))
+    )
+    return result.scalars().all()
