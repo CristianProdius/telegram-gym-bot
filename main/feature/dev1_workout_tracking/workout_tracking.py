@@ -1,37 +1,21 @@
-import asyncio, os
-from dotenv import load_dotenv
-from aiogram import Bot, Dispatcher, Router, F
+# workout_tracking.py
+from aiogram import Router, F
 from aiogram.types import Message
 from aiogram.filters import CommandStart, Command
-
-
-#Step 2
-from db import SessionLocal, init_db
-from models import Workout
-from aiogram.filters import Command
+from .db import SessionLocal
+from .models import Workout
 import re
-from datetime import datetime , timezone
-
-#step 4
+from datetime import datetime, timezone
 from sqlalchemy import select
 
-load_dotenv()
-TOKEN = os.getenv("TELEGRAM_TOKEN")
-bot = Bot(TOKEN)
-dp = Dispatcher()
+# Создаем свой собственный роутер для этого модуля
 router = Router()
 
-@router.message(CommandStart())
-async def on_start(m: Message):
-    await m.answer("Привет! Я помогу логировать тренировки.\nКоманды: /log, /today, /help")
-
-@router.message(Command("help"))
-async def on_help(m: Message):
-    await m.answer("Примеры:\n/log BenchPress 3x10x50\n/today — показать сегодняшние записи")
+# Регистрируем хэндлеры на этом роутере
 
 @router.message(Command("log"))
 async def log_workout(m: Message):
-    # ожидаем: /log BenchPress 3x10x50
+    # ... (весь код функции остается без изменений)
     parts = m.text.strip().split(maxsplit=2)
     if len(parts) < 3:
         return await m.answer("Формат: /log Exercise 3x10x50")
@@ -43,7 +27,6 @@ async def log_workout(m: Message):
 
     sets, reps, weight = map(int, m2.groups())
 
-    # Синхронная запись в SQLite (на MVP так можно)
     session = SessionLocal()
     try:
         w = Workout(
@@ -64,7 +47,6 @@ async def log_workout(m: Message):
 async def today(m: Message):
     session = SessionLocal()
     try:
-        # берём записи за последние 24ч (упростим)
         q = select(Workout).where(Workout.user_id == m.from_user.id).order_by(Workout.created_at.desc()).limit(20)
         rows = session.execute(q).scalars().all()
         if not rows:
@@ -74,16 +56,6 @@ async def today(m: Message):
     finally:
         session.close()
 
-# Временно — эхо всего остального
-@router.message(F.text)
-async def echo(m: Message):
-    await m.answer(f"Ты написал: {m.text}")
-
-dp.include_router(router)
-
-async def main():
-    init_db()
-    await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+# Функция для получения роутера из этого модуля (опционально, но удобно)
+def get_router():
+    return router
