@@ -14,7 +14,7 @@ async def refresh_config_message(callback: CallbackQuery, user_id: int):
     )
 
 # ==== Start ====
-@router.message(Command("start"))
+@router.message(Command("timer"))
 async def cmd_start(message: Message):
     user_id = message.from_user.id
     settings[user_id] = {"hours": 0, "minutes": 0, "seconds": 0}

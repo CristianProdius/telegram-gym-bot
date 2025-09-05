@@ -16,6 +16,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'feature'))
 from feature.dev1_workout_tracking.db import init_db
 from feature.dev1_workout_tracking.workout_tracking import router as workout_router
 
+from feature.dev5_rest_timers.handlers import router as dev5_router
+
 # from dev2_module import router as dev2_router
 # from dev3_module import router as dev3_router
 # ... и так далее для dev4, dev5, dev6
@@ -36,6 +38,7 @@ Dispatcher.include_router(main_router)
 
 # Включение роутеров разработчиков.
 Dispatcher.include_router(workout_router)
+Dispatcher.include_router(dev5_router)
 
 # Включение эхо роутера.
 Dispatcher.include_router(echo_router)
