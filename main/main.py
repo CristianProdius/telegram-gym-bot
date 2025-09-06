@@ -9,13 +9,14 @@ from aiogram.types import Message
 from aiogram.filters import CommandStart, Command
 #Импорт внешних пакетов из requirements.txt
 
-# (Даниил) Импорт моих скриптов.
 # Добавляем папку feature в путь поиска модулей
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'feature'))
-# Теперь импортируем из пакета dev1_workout_tracking
+# (Даниил) Импорт моих скриптов.
 from feature.dev1_workout_tracking.db import init_db
 from feature.dev1_workout_tracking.workout_tracking import router as workout_router
+from feature.dev1_workout_tracking.userProfiling import get_or_create_user
 
+# (Даниил) Импорт скриптов Макса.
 from feature.dev5_rest_timers.handlers import router as dev5_router
 
 # from dev2_module import router as dev2_router
@@ -51,9 +52,18 @@ async def main():
     # Запускаем поллинг
     await Dispatcher.start_polling(bot)
 
+
 @main_router.message(CommandStart())
 async def on_start(m: Message):
-    await m.answer("Привет! Я помогу логировать тренировки.\nКоманды: /log, /today, /help")
+    # Создаем/получаем пользователя при старте
+    user = get_or_create_user(
+        telegram_id=m.from_user.id,
+        username=m.from_user.username,
+        first_name=m.from_user.first_name,
+        last_name=m.from_user.last_name
+    )
+
+    await m.answer(f"Привет, {m.from_user.first_name}! Я помогу логировать тренировки.")
 
 @main_router.message(Command("help"))
 async def on_help(m: Message):
