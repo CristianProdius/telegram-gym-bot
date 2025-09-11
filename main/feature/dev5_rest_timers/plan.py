@@ -1,9 +1,12 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart, BaseFilter
+from aiogram import Router
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from datetime import datetime, timedelta, time
 import re
+
+router = Router()
 
 async def make_a_plan(token: str):
     # Custom filter for time format (HH:MM)
