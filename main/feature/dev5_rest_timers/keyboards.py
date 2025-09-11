@@ -1,5 +1,7 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from .services import settings
+from .services import schedules, day_names, day_codes
+
 
 def build_timer_keyboard(user_id: int) -> InlineKeyboardMarkup:
     s = settings.get(user_id, {"hours": 0, "minutes": 0, "seconds": 0})
