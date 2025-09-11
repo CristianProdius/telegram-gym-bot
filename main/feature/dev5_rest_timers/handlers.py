@@ -9,7 +9,7 @@ router = Router()
 
 async def refresh_config_message(callback: CallbackQuery, user_id: int):
     await callback.message.edit_text(
-        "Hello! 👋 Set your timer:",
+        "Hello! 👋 Set your timer nigga:",
         reply_markup=build_timer_keyboard(user_id)
     )
 
