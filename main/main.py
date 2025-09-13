@@ -20,7 +20,7 @@ from feature.dev1_workout_tracking.userProfiling import get_or_create_user
 from feature.dev5_rest_timers.handlers import router as dev5_router
 
 # from dev2_module import router as dev2_router
-# from dev3_module import router as dev3_router
+from feature.dev3_progress_stats.stats_main import stats_router as dev3_router
 # ... и так далее для dev4, dev5, dev6
 
 load_dotenv()
@@ -40,7 +40,7 @@ Dispatcher.include_router(main_router)
 # Включение роутеров разработчиков.
 Dispatcher.include_router(workout_router)
 Dispatcher.include_router(dev5_router)
-
+Dispatcher.include_router(dev3_router)
 # Включение эхо роутера.
 Dispatcher.include_router(echo_router)
 # dp.include_router(dev3_router)
