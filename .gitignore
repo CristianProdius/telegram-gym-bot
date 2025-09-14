@@ -161,6 +161,7 @@ desktop.ini
 # Logs
 logs/
 *.log
+bot.log
 
 # Temporary files
 tmp/
@@ -191,8 +192,11 @@ coverage.xml
 *.cover
 
 # Documentation build
+# Keep docs folder but ignore build artifacts
 docs/_build/
 docs/site/
+!docs/*.md
+!docs/qwerty
 
 # Package manager
 node_modules/

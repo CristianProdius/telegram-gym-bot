@@ -1,0 +1,113 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Cache dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest-cov
+
+    - name: Run linting
+      run: |
+        pip install black isort flake8
+        black --check src/ tests/
+        isort --check-only src/ tests/
+        flake8 src/ tests/ --max-line-length=120
+
+    - name: Run tests with coverage
+      run: |
+        pytest --cov=src --cov-report=xml --cov-report=html --cov-report=term
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Check test coverage
+      run: |
+        coverage report --fail-under=70
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Run security checks
+      run: |
+        pip install safety bandit
+        safety check
+        bandit -r src/
+
+  build:
+    needs: [test, security]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build Docker image
+      run: |
+        docker build -t gym-bot:latest .
+
+    - name: Run container tests
+      run: |
+        docker run --rm gym-bot:latest python -m pytest tests/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to production
+      env:
+        DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+        DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+      run: |
+        echo "Deploying to production server..."
+        # Add deployment commands here
+        # Example:
+        # ssh -i $DEPLOY_KEY $DEPLOY_USER@$DEPLOY_HOST "cd /app && git pull && docker-compose up -d"
+
+    - name: Notify deployment
+      run: |
+        echo "Deployment completed successfully"

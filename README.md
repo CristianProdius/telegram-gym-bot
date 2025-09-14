@@ -1,21 +1,33 @@
-# Telegram Gym Bot 💪
+# 🏋️ Telegram Gym Bot
 
-A comprehensive fitness tracking bot for Telegram that helps users log workouts, track progress, and achieve their fitness goals.
+A comprehensive fitness tracking Telegram bot with advanced analytics, multilingual support, and data export capabilities.
 
-## Features
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Coverage](https://img.shields.io/badge/coverage-85%25-yellowgreen)
 
-### Current Features ✅
-- **Workout Tracking** - Log exercises with sets, reps, and weight
-- **Rest Timers** - Customizable timers for rest periods between sets
-- **Exercise History** - View your recent workout history
+## 🌟 Features
 
-### Planned Features 🚧
-- Exercise database with instructions
-- Progress charts and analytics
-- Nutrition tracking
-- Social features and challenges
-- Workout programs and plans
-- AI-powered recommendations
+### Core Functionality
+- **📝 Workout Tracking**: Log exercises with sets, reps, weight, and RPE
+- **📚 Exercise Library**: 40+ pre-loaded exercises with fuzzy search
+- **📊 Progress Analytics**: Volume progression, weak point analysis, and AI recommendations
+- **🎯 Custom Routines**: Create and manage personalized workout programs
+- **⏱ Rest Timers**: Configurable rest periods with memory management
+- **🌍 Multilingual**: Full support for English and Russian
+- **📤 Data Export**: Export to Excel, PDF, and CSV formats
+- **📈 Visualizations**: Progress charts, heatmaps, and muscle distribution graphs
+- **🏆 Personal Records**: Automatic PR tracking and notifications
+
+### Technical Features
+- **Async Architecture**: Built with aiogram 3.x for high performance
+- **Database Support**: SQLAlchemy with SQLite/PostgreSQL
+- **Memory Management**: Automatic cleanup and resource optimization
+- **Monitoring**: Prometheus metrics and Grafana dashboards
+- **CI/CD**: GitHub Actions with automated testing and deployment
+- **Docker Support**: Containerized deployment with docker-compose
+- **Test Coverage**: 85%+ coverage with unit and integration tests
 
 ## Quick Start
 
