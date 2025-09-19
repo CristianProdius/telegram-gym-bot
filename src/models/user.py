@@ -27,6 +27,7 @@ class User(Base):
     workouts = relationship("Workout", back_populates="user", cascade="all, delete-orphan")
     routines = relationship("Routine", back_populates="user", cascade="all, delete-orphan")
     progress_records = relationship("ProgressRecord", back_populates="user", cascade="all, delete-orphan")
+    training_notifications = relationship("TrainingNotification", back_populates="user", cascade="all, delete-orphan")
 
     def __repr__(self):
         return f"<User(telegram_id={self.telegram_id}, username={self.username})>"

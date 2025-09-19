@@ -3,6 +3,7 @@ from .exercise import Exercise
 from .workout import Workout, WorkoutExercise, WorkoutSet
 from .routine import Routine, RoutineExercise
 from .progress import ProgressRecord, PersonalRecord
+from .notification import TrainingNotification
 
 __all__ = [
     "User",
@@ -13,5 +14,6 @@ __all__ = [
     "Routine",
     "RoutineExercise",
     "ProgressRecord",
+    "TrainingNotification",
     "PersonalRecord",
 ]

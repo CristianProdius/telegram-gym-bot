@@ -3,6 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
+from src.services.notification_service import notification_service
 
 from src.bot.config import config
 from src.handlers import register_all_handlers
@@ -57,6 +58,12 @@ class GymBot:
         from src.services.timer_service import timer_manager
         timer_manager.start_cleanup_task()
         logger.info("Background tasks started")
+
+        # Initialize notification service
+        notification_service.set_bot(self.bot)
+        await notification_service.initialize_all_notifications()
+        logger.info("Notification service initialized")
+
 
     async def on_shutdown(self):
         """Actions to perform on bot shutdown"""

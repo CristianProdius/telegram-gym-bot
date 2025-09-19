@@ -17,7 +17,7 @@ class Translations:
         "en": {
             # Welcome and help messages
             "welcome": "👋 Welcome to Gym Bot! I'm your personal workout assistant.\n\nI can help you:\n• 📝 Track workouts\n• ⏱ Set rest timers\n• 📊 Analyze progress\n• 💪 Achieve your goals\n\nUse /help to see all commands!",
-            "help": "📚 Available Commands:\n\n🏋️ Workouts:\n/log - Log a workout\n/today - Today's workouts\n/history - Workout history\n\n⏱ Timers:\n/timer - Set rest timer\n\n📊 Progress:\n/stats - View statistics\n/progress - Progress charts\n/records - Personal records\n\n🎯 Routines:\n/routines - My routines\n/create_routine - Create routine\n\n👤 Profile:\n/profile - View profile\n/settings - Bot settings\n\n📤 Export:\n/export - Export data",
+            "help": "📚 Available Commands:\n\n🏋️ Workouts:\n/log - Log a workout\n/today - Today's workouts\n/history - Workout history\n\n⏱ Timers and notifications:\n/timer - Set rest timer\n/notification - Set a notification an hour before training\n\n📊 Progress:\n/stats - View statistics\n/progress - Progress charts\n/records - Personal records\n\n🎯 Routines:\n/routines - My routines\n/create_routine - Create routine\n\n👤 Profile:\n/profile - View profile\n/settings - Bot settings\n\n📤 Export:\n/export - Export data",
 
             # Workout messages
             "select_exercise": "Select an exercise or type to search:",
@@ -65,12 +65,42 @@ class Translations:
             "btn_back": "⬅️ Back",
             "btn_cancel": "❌ Cancel",
             "btn_finish": "✅ Finish",
+
+            # Notification messages
+            "notification_menu": "🔔 <b>Training Notifications</b>\n\nManage your training reminders. Get notified 1 hour before your scheduled workouts!\n\nChoose an action:",
+            "notification_add": "📅 <b>Add Training Notification</b>\n\nChoose the day of the week for your training:",
+            "notification_list_empty": "📭 <b>No Training Notifications</b>\n\nYou haven't set up any training reminders yet.\nUse 'Add Training' to create your first notification!",
+            "notification_list": "📋 <b>Your Training Notifications</b>\n\n{notifications}\n\n💡 You'll receive reminders 1 hour before each training session.",
+            "notification_replace_empty": "📭 <b>No Training Notifications</b>\n\nYou don't have any training notifications to replace.\nUse 'Add Training' to create your first notification!",
+            "notification_replace": "✏️ <b>Replace Training Notification</b>\n\nSelect the notification you want to replace:",
+            "notification_max_limit": "⚠️ <b>Maximum Limit Reached</b>\n\nYou already have 5 training notifications:\n\n{notifications}\n\nUse 'Replace Training' to modify existing ones.",
+            "notification_set_time": "🕒 <b>Set Training Time</b>\n\nSelected day: <b>{day}</b>\n\nPlease enter the training time in HH:MM format (24-hour):\n\nExamples: 09:30, 18:00, 20:15",
+            "notification_set_new_time": "🕒 <b>Set New Training Time</b>\n\nSelected day: <b>{day}</b>\n\nPlease enter the new training time in HH:MM format (24-hour):\n\nExamples: 09:30, 18:00, 20:15",
+            "notification_invalid_time_format": "❌ Invalid time format!\n\nPlease enter time in HH:MM format (24-hour).\nExamples: 09:30, 18:00, 20:15",
+            "notification_invalid_time_range": "❌ Invalid time!\n\nPlease enter a valid time between 00:00 and 23:59.",
+            "notification_added": "✅ <b>Training Notification Added!</b>\n\n📅 Day: <b>{day}</b>\n🕒 Time: <b>{time}</b>\n\nYou'll receive a reminder 1 hour before your training! 🔔",
+            "notification_updated": "✅ <b>Training Notification Updated!</b>\n\n📅 Day: <b>{day}</b>\n🕒 Time: <b>{time}</b>\n\nYour reminder has been rescheduled! 🔔",
+            "training_reminder": "🏋️‍♂️ <b>Training Reminder</b>\n\nYour training starts in 1 hour! Time to get ready! 💪",
+
+            # Day names
+            "day_monday": "Monday",
+            "day_tuesday": "Tuesday", 
+            "day_wednesday": "Wednesday",
+            "day_thursday": "Thursday",
+            "day_friday": "Friday",
+            "day_saturday": "Saturday",
+            "day_sunday": "Sunday",
+
+            # Notification button labels
+            "btn_add_training": "➕ Add Training",
+            "btn_view_list": "📋 View List",
+            "btn_replace_training": "✏️ Replace Training",
         },
 
         "ru": {
             # Welcome and help messages
             "welcome": "👋 Добро пожаловать в Gym Bot! Я ваш персональный помощник для тренировок.\n\nЯ помогу вам:\n• 📝 Вести дневник тренировок\n• ⏱ Устанавливать таймеры отдыха\n• 📊 Анализировать прогресс\n• 💪 Достигать целей\n\nИспользуйте /help для просмотра команд!",
-            "help": "📚 Доступные команды:\n\n🏋️ Тренировки:\n/log - Записать тренировку\n/today - Сегодняшние тренировки\n/history - История тренировок\n\n⏱ Таймеры:\n/timer - Установить таймер\n\n📊 Прогресс:\n/stats - Статистика\n/progress - Графики прогресса\n/records - Личные рекорды\n\n🎯 Программы:\n/routines - Мои программы\n/create_routine - Создать программу\n\n👤 Профиль:\n/profile - Мой профиль\n/settings - Настройки\n\n📤 Экспорт:\n/export - Экспорт данных",
+            "help": "📚 Доступные команды:\n\n🏋️ Тренировки:\n/log - Записать тренировку\n/today - Сегодняшние тренировки\n/history - История тренировок\n\n⏱ Таймеры и уведомления:\n/timer - Установить таймер\n\n/notification - Поставить уведомление за час до тренировки\n📊 Прогресс:\n/stats - Статистика\n/progress - Графики прогресса\n/records - Личные рекорды\n\n🎯 Программы:\n/routines - Мои программы\n/create_routine - Создать программу\n\n👤 Профиль:\n/profile - Мой профиль\n/settings - Настройки\n\n📤 Экспорт:\n/export - Экспорт данных",
 
             # Workout messages
             "select_exercise": "Выберите упражнение или введите для поиска:",
@@ -118,6 +148,36 @@ class Translations:
             "btn_back": "⬅️ Назад",
             "btn_cancel": "❌ Отмена",
             "btn_finish": "✅ Завершить",
+
+            # Notification messages
+            "notification_menu": "🔔 <b>Уведомления о тренировках</b>\n\nУправляйте напоминаниями о тренировках. Получайте уведомления за 1 час до запланированных тренировок!\n\nВыберите действие:",
+            "notification_add": "📅 <b>Добавить уведомление о тренировке</b>\n\nВыберите день недели для тренировки:",
+            "notification_list_empty": "📭 <b>Нет уведомлений о тренировках</b>\n\nВы ещё не настроили напоминания о тренировках.\nИспользуйте 'Добавить тренировку' для создания первого уведомления!",
+            "notification_list": "📋 <b>Ваши уведомления о тренировках</b>\n\n{notifications}\n\n💡 Вы будете получать напоминания за 1 час до каждой тренировки.",
+            "notification_replace_empty": "📭 <b>Нет уведомлений о тренировках</b>\n\nУ вас нет уведомлений о тренировках для замены.\nИспользуйте 'Добавить тренировку' для создания первого уведомления!",
+            "notification_replace": "✏️ <b>Заменить уведомление о тренировке</b>\n\nВыберите уведомление, которое хотите заменить:",
+            "notification_max_limit": "⚠️ <b>Достигнут максимальный лимит</b>\n\nУ вас уже есть 5 уведомлений о тренировках:\n\n{notifications}\n\nИспользуйте 'Заменить тренировку' для изменения существующих.",
+            "notification_set_time": "🕒 <b>Установить время тренировки</b>\n\nВыбранный день: <b>{day}</b>\n\nВведите время тренировки в формате ЧЧ:ММ (24-часовой):\n\nПримеры: 09:30, 18:00, 20:15",
+            "notification_set_new_time": "🕒 <b>Установить новое время тренировки</b>\n\nВыбранный день: <b>{day}</b>\n\nВведите новое время тренировки в формате ЧЧ:ММ (24-часовой):\n\nПримеры: 09:30, 18:00, 20:15",
+            "notification_invalid_time_format": "❌ Неверный формат времени!\n\nВведите время в формате ЧЧ:ММ (24-часовой).\nПримеры: 09:30, 18:00, 20:15",
+            "notification_invalid_time_range": "❌ Неверное время!\n\nВведите корректное время между 00:00 и 23:59.",
+            "notification_added": "✅ <b>Уведомление о тренировке добавлено!</b>\n\n📅 День: <b>{day}</b>\n🕒 Время: <b>{time}</b>\n\nВы получите напоминание за 1 час до тренировки! 🔔",
+            "notification_updated": "✅ <b>Уведомление о тренировке обновлено!</b>\n\n📅 День: <b>{day}</b>\n🕒 Время: <b>{time}</b>\n\nВаше напоминание перенесено! 🔔",
+            "training_reminder": "🏋️‍♂️ <b>Напоминание о тренировке</b>\n\nВаша тренировка начнётся через 1 час! Время готовиться! 💪",
+
+            # Day names
+            "day_monday": "Понедельник",
+            "day_tuesday": "Вторник",
+            "day_wednesday": "Среда", 
+            "day_thursday": "Четверг",
+            "day_friday": "Пятница",
+            "day_saturday": "Суббота",
+            "day_sunday": "Воскресенье",
+
+            # Notification button labels
+            "btn_add_training": "➕ Добавить тренировку",
+            "btn_view_list": "📋 Список",
+            "btn_replace_training": "✏️ Заменить тренировку",
         }
     }
 
