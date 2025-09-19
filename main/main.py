@@ -43,7 +43,7 @@ Dispatcher.include_router(dev5_router)
 Dispatcher.include_router(dev3_router)
 # Включение эхо роутера.
 Dispatcher.include_router(echo_router)
-# dp.include_router(dev3_router)
+# dp.include_router(dev3_router)    
 # ... и так далее
 
 async def main():
