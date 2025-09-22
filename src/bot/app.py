@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
 from src.services.notification_service import notification_service
+from src.services.nutrition_service import nutrition_service
 
 from src.bot.config import config
 from src.handlers import register_all_handlers
@@ -64,27 +65,50 @@ class GymBot:
         await notification_service.initialize_all_notifications()
         logger.info("Notification service initialized")
 
+        # Initialize nutrition service HTTP session
+        await nutrition_service.create_session()
+        logger.info("Nutrition service initialized")
+
+        logger.info("Bot startup complete!")
 
     async def on_shutdown(self):
         """Actions to perform on bot shutdown"""
         logger.info("Shutting down bot...")
+        
+        # Shutdown nutrition service HTTP session
+        await nutrition_service.close_session()
+        logger.info("Nutrition service session closed")
+        
+        # Shutdown notification service
+        notification_service.shutdown()
+        logger.info("Notification service shutdown")
 
         # Cleanup timers
         from src.services.timer_service import timer_manager
         timer_manager.shutdown()
+        logger.info("Timer service shutdown")
 
         # Close database
         await close_db()
+        logger.info("Database connection closed")
 
         # Close bot session
         await self.bot.session.close()
+        logger.info("Bot session closed")
+        
         logger.info("Bot shutdown complete")
 
     async def start_polling(self):
         """Start bot in polling mode"""
         try:
             await self.on_startup()
+            logger.info("Starting polling...")
             await self.dp.start_polling(self.bot)
+        except KeyboardInterrupt:
+            logger.info("Received keyboard interrupt")
+        except Exception as e:
+            logger.error(f"Error during polling: {e}")
+            raise
         finally:
             await self.on_shutdown()
 
@@ -99,3 +123,24 @@ class GymBot:
 def create_bot() -> GymBot:
     """Factory function to create bot instance"""
     return GymBot()
+
+# Main entry point
+async def main():
+    """Main entry point for the bot"""
+    # Validate configuration before starting
+    if not config.validate():
+        logger.error("Configuration validation failed!")
+        return
+
+    # Create and start bot
+    bot = create_bot()
+    
+    if config.IS_PRODUCTION and config.WEBHOOK_URL:
+        logger.info("Starting in webhook mode")
+        await bot.start_webhook()
+    else:
+        logger.info("Starting in polling mode")
+        await bot.start_polling()
+
+if __name__ == "__main__":
+    asyncio.run(main())
