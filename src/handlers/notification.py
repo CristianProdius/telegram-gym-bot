@@ -18,7 +18,9 @@ user_service = UserService()
 
 class NotificationStates(StatesGroup):
     waiting_for_time_add = State()
+    waiting_for_reminder_time_add = State()
     waiting_for_time_replace = State()
+    waiting_for_reminder_time_replace = State()
 
 # Day mappings - now using translation keys
 DAY_TRANSLATION_KEYS = ['day_monday', 'day_tuesday', 'day_wednesday', 'day_thursday', 'day_friday', 'day_saturday', 'day_sunday']
@@ -56,6 +58,18 @@ def create_day_keyboard(user_id: int, action: str, notification_id: int = None):
     buttons.append([InlineKeyboardButton(text=i18n.get("btn_back", user_id), callback_data="notif_back")])
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
+def create_reminder_time_keyboard(user_id: int):
+    """Create keyboard for selecting reminder time"""
+    buttons = [
+        [InlineKeyboardButton(text=i18n.get("reminder_15_min", user_id), callback_data="reminder_15")],
+        [InlineKeyboardButton(text=i18n.get("reminder_30_min", user_id), callback_data="reminder_30")],
+        [InlineKeyboardButton(text=i18n.get("reminder_1_hour", user_id), callback_data="reminder_60")],
+        [InlineKeyboardButton(text=i18n.get("reminder_2_hours", user_id), callback_data="reminder_120")],
+        [InlineKeyboardButton(text=i18n.get("reminder_custom", user_id), callback_data="reminder_custom")],
+        [InlineKeyboardButton(text=i18n.get("btn_back", user_id), callback_data="notif_back")]
+    ]
+    return InlineKeyboardMarkup(inline_keyboard=buttons)
+
 def create_notifications_keyboard(user_id: int, notifications):
     """Create keyboard for selecting notifications to replace"""
     day_names = get_day_names(user_id)
@@ -64,7 +78,20 @@ def create_notifications_keyboard(user_id: int, notifications):
     for notification in notifications:
         day_name = day_names[notification.weekday]
         time_str = notification.training_time.strftime("%H:%M")
-        text = f"{day_name} {time_str}"
+        reminder_minutes = notification.reminder_minutes_before
+        
+        # Format reminder time display
+        if reminder_minutes < 60:
+            reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+        else:
+            hours = reminder_minutes // 60
+            remaining_minutes = reminder_minutes % 60
+            if remaining_minutes == 0:
+                reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+            else:
+                reminder_str = i18n.get("reminder_format_hours_minutes", user_id, hours=hours, minutes=remaining_minutes)
+        
+        text = f"{day_name} {time_str} ({reminder_str})"
         buttons.append([InlineKeyboardButton(
             text=text,
             callback_data=f"notif_select_{notification.id}"
@@ -81,7 +108,20 @@ def format_notifications_list(user_id: int, notifications) -> str:
     for notif in notifications:
         day_name = day_names[notif.weekday]
         time_str = notif.training_time.strftime("%H:%M")
-        notif_list.append(f"• {day_name} {time_str}")
+        reminder_minutes = notif.reminder_minutes_before
+        
+        # Format reminder time
+        if reminder_minutes < 60:
+            reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+        else:
+            hours = reminder_minutes // 60
+            remaining_minutes = reminder_minutes % 60
+            if remaining_minutes == 0:
+                reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+            else:
+                reminder_str = i18n.get("reminder_format_hours_minutes", user_id, hours=hours, minutes=remaining_minutes)
+        
+        notif_list.append(f"• {day_name} {time_str} ({reminder_str})")
     
     return "\n".join(notif_list)
 
@@ -278,20 +318,112 @@ async def handle_time_input_add(message: types.Message, state: FSMContext):
         await message.answer(i18n.get("notification_invalid_time_range", user_id))
         return
     
+    # Store training time and ask for reminder time
+    await state.update_data(training_time=training_time)
+    await state.set_state(NotificationStates.waiting_for_reminder_time_add)
+    
+    await message.answer(
+        i18n.get("notification_select_reminder_time", user_id),
+        reply_markup=create_reminder_time_keyboard(user_id)
+    )
+
+@router.callback_query(F.data.startswith("reminder_"), NotificationStates.waiting_for_reminder_time_add)
+async def handle_reminder_time_selection_add(callback: types.CallbackQuery, state: FSMContext):
+    """Handle reminder time selection for adding notification"""
+    user_id = callback.from_user.id
+    
+    async with get_session() as session:
+        user = await user_service.get_or_create_user(session, user_id)
+        i18n.set_user_language(user_id, user.language_code)
+    
+    if callback.data == "reminder_custom":
+        await callback.message.edit_text(
+            i18n.get("notification_enter_custom_reminder", user_id),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=i18n.get("btn_back", user_id), callback_data="notif_back")]
+            ])
+        )
+        await callback.answer()
+        return
+    
+    # Extract minutes from callback data
+    reminder_minutes = int(callback.data.split("_")[1])
+    
     data = await state.get_data()
     day_code = data.get("day_code")
+    training_time = data.get("training_time")
     weekday = DAY_MAP[day_code]
     
     async with get_session() as session:
         user = await user_service.get_or_create_user(session, user_id)
-        await notification_service.add_notification(session, user.id, weekday, training_time)
+        await notification_service.add_notification(
+            session, user.id, weekday, training_time, reminder_minutes
+        )
     
     day_names = get_day_names(user_id)
     day_name = day_names[weekday]
     time_str = training_time.strftime("%H:%M")
     
+    # Format reminder time for display
+    if reminder_minutes < 60:
+        reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+    else:
+        hours = reminder_minutes // 60
+        reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+    
+    await callback.message.edit_text(
+        i18n.get("notification_added", user_id, day=day_name, time=time_str, reminder=reminder_str),
+        reply_markup=create_main_keyboard(user_id)
+    )
+    await state.clear()
+    await callback.answer()
+
+@router.message(NotificationStates.waiting_for_reminder_time_add)
+async def handle_custom_reminder_input_add(message: types.Message, state: FSMContext):
+    """Handle custom reminder time input for adding notification"""
+    user_id = message.from_user.id
+    
+    async with get_session() as session:
+        user = await user_service.get_or_create_user(session, user_id)
+        i18n.set_user_language(user_id, user.language_code)
+    
+    try:
+        reminder_minutes = int(message.text)
+        if not (1 <= reminder_minutes <= 1440):  # Max 24 hours
+            await message.answer(i18n.get("notification_invalid_reminder_range", user_id))
+            return
+    except ValueError:
+        await message.answer(i18n.get("notification_invalid_reminder_format", user_id))
+        return
+    
+    data = await state.get_data()
+    day_code = data.get("day_code")
+    training_time = data.get("training_time")
+    weekday = DAY_MAP[day_code]
+    
+    async with get_session() as session:
+        user = await user_service.get_or_create_user(session, user_id)
+        await notification_service.add_notification(
+            session, user.id, weekday, training_time, reminder_minutes
+        )
+    
+    day_names = get_day_names(user_id)
+    day_name = day_names[weekday]
+    time_str = training_time.strftime("%H:%M")
+    
+    # Format reminder time for display
+    if reminder_minutes < 60:
+        reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+    else:
+        hours = reminder_minutes // 60
+        remaining_minutes = reminder_minutes % 60
+        if remaining_minutes == 0:
+            reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+        else:
+            reminder_str = i18n.get("reminder_format_hours_minutes", user_id, hours=hours, minutes=remaining_minutes)
+    
     await message.answer(
-        i18n.get("notification_added", user_id, day=day_name, time=time_str),
+        i18n.get("notification_added", user_id, day=day_name, time=time_str, reminder=reminder_str),
         reply_markup=create_main_keyboard(user_id)
     )
     await state.clear()
@@ -319,22 +451,112 @@ async def handle_time_input_replace(message: types.Message, state: FSMContext):
         await message.answer(i18n.get("notification_invalid_time_range", user_id))
         return
     
+    # Store training time and ask for reminder time
+    await state.update_data(training_time=training_time)
+    await state.set_state(NotificationStates.waiting_for_reminder_time_replace)
+    
+    await message.answer(
+        i18n.get("notification_select_reminder_time", user_id),
+        reply_markup=create_reminder_time_keyboard(user_id)
+    )
+
+@router.callback_query(F.data.startswith("reminder_"), NotificationStates.waiting_for_reminder_time_replace)
+async def handle_reminder_time_selection_replace(callback: types.CallbackQuery, state: FSMContext):
+    """Handle reminder time selection for replacing notification"""
+    user_id = callback.from_user.id
+    
+    async with get_session() as session:
+        user = await user_service.get_or_create_user(session, user_id)
+        i18n.set_user_language(user_id, user.language_code)
+    
+    if callback.data == "reminder_custom":
+        await callback.message.edit_text(
+            i18n.get("notification_enter_custom_reminder", user_id),
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+                [InlineKeyboardButton(text=i18n.get("btn_back", user_id), callback_data="notif_back")]
+            ])
+        )
+        await callback.answer()
+        return
+    
+    # Extract minutes from callback data
+    reminder_minutes = int(callback.data.split("_")[1])
+    
     data = await state.get_data()
     day_code = data.get("day_code")
     notification_id = data.get("notification_id")
+    training_time = data.get("training_time")
     weekday = DAY_MAP[day_code]
     
     async with get_session() as session:
         await notification_service.update_notification(
-            session, notification_id, weekday, training_time
+            session, notification_id, weekday, training_time, reminder_minutes
         )
     
     day_names = get_day_names(user_id)
     day_name = day_names[weekday]
     time_str = training_time.strftime("%H:%M")
     
+    # Format reminder time for display
+    if reminder_minutes < 60:
+        reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+    else:
+        hours = reminder_minutes // 60
+        reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+    
+    await callback.message.edit_text(
+        i18n.get("notification_updated", user_id, day=day_name, time=time_str, reminder=reminder_str),
+        reply_markup=create_main_keyboard(user_id)
+    )
+    await state.clear()
+    await callback.answer()
+
+@router.message(NotificationStates.waiting_for_reminder_time_replace)
+async def handle_custom_reminder_input_replace(message: types.Message, state: FSMContext):
+    """Handle custom reminder time input for replacing notification"""
+    user_id = message.from_user.id
+    
+    async with get_session() as session:
+        user = await user_service.get_or_create_user(session, user_id)
+        i18n.set_user_language(user_id, user.language_code)
+    
+    try:
+        reminder_minutes = int(message.text)
+        if not (1 <= reminder_minutes <= 1440):  # Max 24 hours
+            await message.answer(i18n.get("notification_invalid_reminder_range", user_id))
+            return
+    except ValueError:
+        await message.answer(i18n.get("notification_invalid_reminder_format", user_id))
+        return
+    
+    data = await state.get_data()
+    day_code = data.get("day_code")
+    notification_id = data.get("notification_id")
+    training_time = data.get("training_time")
+    weekday = DAY_MAP[day_code]
+    
+    async with get_session() as session:
+        await notification_service.update_notification(
+            session, notification_id, weekday, training_time, reminder_minutes
+        )
+    
+    day_names = get_day_names(user_id)
+    day_name = day_names[weekday]
+    time_str = training_time.strftime("%H:%M")
+    
+    # Format reminder time for display
+    if reminder_minutes < 60:
+        reminder_str = i18n.get("reminder_format_minutes", user_id, minutes=reminder_minutes)
+    else:
+        hours = reminder_minutes // 60
+        remaining_minutes = reminder_minutes % 60
+        if remaining_minutes == 0:
+            reminder_str = i18n.get("reminder_format_hours", user_id, hours=hours)
+        else:
+            reminder_str = i18n.get("reminder_format_hours_minutes", user_id, hours=hours, minutes=remaining_minutes)
+    
     await message.answer(
-        i18n.get("notification_updated", user_id, day=day_name, time=time_str),
+        i18n.get("notification_updated", user_id, day=day_name, time=time_str, reminder=reminder_str),
         reply_markup=create_main_keyboard(user_id)
     )
     await state.clear()

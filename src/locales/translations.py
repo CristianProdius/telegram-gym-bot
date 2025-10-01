@@ -65,7 +65,7 @@ class Translations:
             "btn_back": "⬅️ Back",
             "btn_cancel": "❌ Cancel",
             "btn_finish": "✅ Finish",
-
+            
             # Notification messages
             "notification_menu": "🔔 <b>Training Notifications</b>\n\nManage your training reminders. Get notified 1 hour before your scheduled workouts!\n\nChoose an action:",
             "notification_add": "📅 <b>Add Training Notification</b>\n\nChoose the day of the week for your training:",
@@ -81,6 +81,35 @@ class Translations:
             "notification_added": "✅ <b>Training Notification Added!</b>\n\n📅 Day: <b>{day}</b>\n🕒 Time: <b>{time}</b>\n\nYou'll receive a reminder 1 hour before your training! 🔔",
             "notification_updated": "✅ <b>Training Notification Updated!</b>\n\n📅 Day: <b>{day}</b>\n🕒 Time: <b>{time}</b>\n\nYour reminder has been rescheduled! 🔔",
             "training_reminder": "🏋️‍♂️ <b>Training Reminder</b>\n\nYour training starts in 1 hour! Time to get ready! 💪",
+
+            # Reminder time selection
+            "notification_select_reminder_time": "⏰ <b>Select Reminder Time</b>\n\nWhen do you want to be reminded before your training?\n\nChoose a preset time or enter a custom value:",
+            "reminder_15_min": "⏱️ 15 minutes before",
+            "reminder_30_min": "⏱️ 30 minutes before",
+            "reminder_1_hour": "⏱️ 1 hour before",
+            "reminder_2_hours": "⏱️ 2 hours before",
+            "reminder_custom": "✏️ Custom time",
+            
+            # Custom reminder input
+            "notification_enter_custom_reminder": "⏰ <b>Enter Custom Reminder Time</b>\n\nEnter how many minutes before training you want to be reminded:\n\n<i>Examples: 45, 90, 120</i>\n\n(Maximum: 1440 minutes = 24 hours)",
+            "notification_invalid_reminder_format": "❌ Invalid format!\n\nPlease enter a number of minutes.\nExamples: 45, 90, 120",
+            "notification_invalid_reminder_range": "❌ Invalid reminder time!\n\nPlease enter a value between 1 and 1440 minutes (1-24 hours).",
+            
+            # Reminder time formatting
+            "reminder_format_minutes": "{minutes} min before",
+            "reminder_format_hours": "{hours}h before",
+            "reminder_format_hours_minutes": "{hours}h {minutes}min before",
+            
+            # Updated notification messages
+            "notification_menu": "🔔 <b>Training Notifications</b>\n\nManage your training reminders. Set custom reminder times for each workout!\n\nChoose an action:",
+            "notification_list": "📋 <b>Your Training Notifications</b>\n\n{notifications}\n\n💡 You'll receive reminders at your chosen times before each training session.",
+            "notification_added": "✅ <b>Training Notification Added!</b>\n\n📅 Day: <b>{day}</b>\n🕐 Time: <b>{time}</b>\n⏰ Reminder: <b>{reminder}</b>\n\nYou'll be notified at the specified time! 🔔",
+            "notification_updated": "✅ <b>Training Notification Updated!</b>\n\n📅 Day: <b>{day}</b>\n🕐 Time: <b>{time}</b>\n⏰ Reminder: <b>{reminder}</b>\n\nYour reminder has been rescheduled! 🔔",
+            
+            # Training reminders with custom times
+            "training_reminder_minutes": "🏋️‍♂️ <b>Training Reminder</b>\n\nYour training starts in {minutes} minutes! Time to get ready! 💪",
+            "training_reminder_hours": "🏋️‍♂️ <b>Training Reminder</b>\n\nYour training starts in {hours} hour(s)! Time to get ready! 💪",
+            "training_reminder_hours_minutes": "🏋️‍♂️ <b>Training Reminder</b>\n\nYour training starts in {hours} hour(s) and {minutes} minutes! Time to get ready! 💪",
 
             # Day names
             "day_monday": "Monday",
@@ -204,7 +233,7 @@ class Translations:
             "btn_back": "⬅️ Назад",
             "btn_cancel": "❌ Отмена",
             "btn_finish": "✅ Завершить",
-
+            
             # Notification messages
             "notification_menu": "🔔 <b>Уведомления о тренировках</b>\n\nУправляйте напоминаниями о тренировках. Получайте уведомления за 1 час до запланированных тренировок!\n\nВыберите действие:",
             "notification_add": "📅 <b>Добавить уведомление о тренировке</b>\n\nВыберите день недели для тренировки:",
@@ -221,6 +250,34 @@ class Translations:
             "notification_updated": "✅ <b>Уведомление о тренировке обновлено!</b>\n\n📅 День: <b>{day}</b>\n🕒 Время: <b>{time}</b>\n\nВаше напоминание перенесено! 🔔",
             "training_reminder": "🏋️‍♂️ <b>Напоминание о тренировке</b>\n\nВаша тренировка начнётся через 1 час! Время готовиться! 💪",
 
+            # Reminder time selection
+            "notification_select_reminder_time": "⏰ <b>Выбор времени напоминания</b>\n\nКогда вы хотите получить напоминание перед тренировкой?\n\nВыберите готовое время или введите своё значение:",
+            "reminder_15_min": "⏱️ За 15 минут",
+            "reminder_30_min": "⏱️ За 30 минут",
+            "reminder_1_hour": "⏱️ За 1 час",
+            "reminder_2_hours": "⏱️ За 2 часа",
+            "reminder_custom": "✏️ Своё время",
+    
+            # Custom reminder input
+            "notification_enter_custom_reminder": "⏰ <b>Введите время напоминания</b>\n\nВведите, за сколько минут до тренировки вы хотите получить напоминание:\n\n<i>Примеры: 45, 90, 120</i>\n\n(Максимум: 1440 минут = 24 часа)",
+            "notification_invalid_reminder_format": "❌ Неверный формат!\n\nПожалуйста, введите количество минут.\nПримеры: 45, 90, 120",
+            "notification_invalid_reminder_range": "❌ Неверное время напоминания!\n\nПожалуйста, введите значение от 1 до 1440 минут (1-24 часа).",
+            
+            # Reminder time formatting
+            "reminder_format_minutes": "за {minutes} мин",
+            "reminder_format_hours": "за {hours}ч",
+            "reminder_format_hours_minutes": "за {hours}ч {minutes}мин",
+            
+            # Updated notification messages
+            "notification_menu": "🔔 <b>Уведомления о тренировках</b>\n\nУправляйте напоминаниями о тренировках. Установите своё время напоминания для каждой тренировки!\n\nВыберите действие:",
+            "notification_list": "📋 <b>Ваши уведомления о тренировках</b>\n\n{notifications}\n\n💡 Вы будете получать напоминания в выбранное вами время перед каждой тренировкой.",
+            "notification_added": "✅ <b>Уведомление о тренировке добавлено!</b>\n\n📅 День: <b>{day}</b>\n🕐 Время: <b>{time}</b>\n⏰ Напоминание: <b>{reminder}</b>\n\nВы получите уведомление в указанное время! 🔔",
+            "notification_updated": "✅ <b>Уведомление о тренировке обновлено!</b>\n\n📅 День: <b>{day}</b>\n🕐 Время: <b>{time}</b>\n⏰ Напоминание: <b>{reminder}</b>\n\nВаше напоминание перенесено! 🔔",
+            
+            # Training reminders with custom times
+            "training_reminder_minutes": "🏋️‍♂️ <b>Напоминание о тренировке</b>\n\nВаша тренировка начнётся через {minutes} минут! Время готовиться! 💪",
+            "training_reminder_hours": "🏋️‍♂️ <b>Напоминание о тренировке</b>\n\nВаша тренировка начнётся через {hours} час(а/ов)! Время готовиться! 💪",
+            "training_reminder_hours_minutes": "🏋️‍♂️ <b>Напоминание о тренировке</b>\n\nВаша тренировка начнётся через {hours} час(а/ов) и {minutes} минут! Время готовиться! 💪",
             # Day names
             "day_monday": "Понедельник",
             "day_tuesday": "Вторник",

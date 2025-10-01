@@ -26,13 +26,15 @@ class NotificationService:
         session: AsyncSession,
         user_id: int,
         weekday: int,
-        training_time: time
+        training_time: time,
+        reminder_minutes_before: int = 60
     ) -> TrainingNotification:
         """Add a new training notification"""
         notification = TrainingNotification(
             user_id=user_id,
             weekday=weekday,
-            training_time=training_time
+            training_time=training_time,
+            reminder_minutes_before=reminder_minutes_before
         )
         session.add(notification)
         await session.commit()
@@ -62,7 +64,8 @@ class NotificationService:
         session: AsyncSession,
         notification_id: int,
         weekday: int,
-        training_time: time
+        training_time: time,
+        reminder_minutes_before: int = 60
     ) -> Optional[TrainingNotification]:
         """Update an existing notification"""
         stmt = select(TrainingNotification).where(TrainingNotification.id == notification_id)
@@ -78,6 +81,7 @@ class NotificationService:
         # Update notification
         notification.weekday = weekday
         notification.training_time = training_time
+        notification.reminder_minutes_before = reminder_minutes_before
         await session.commit()
         await session.refresh(notification)
         
@@ -140,14 +144,19 @@ class NotificationService:
                 return
         
         task = asyncio.create_task(
-            self._reminder_loop(telegram_id, notification.weekday, notification.training_time)
+            self._reminder_loop(
+                telegram_id, 
+                notification.weekday, 
+                notification.training_time, 
+                notification.reminder_minutes_before
+            )
         )
         
         if notification.user_id not in self.active_tasks:
             self.active_tasks[notification.user_id] = []
         self.active_tasks[notification.user_id].append(task)
     
-    async def _reminder_loop(self, telegram_id: int, weekday: int, training_time: time):
+    async def _reminder_loop(self, telegram_id: int, weekday: int, training_time: time, reminder_minutes_before: int):
         """Main reminder loop"""
         while True:
             try:
@@ -167,10 +176,10 @@ class NotificationService:
                 if next_training <= now:
                     next_training += timedelta(days=7)
             
-                next_reminder = next_training - timedelta(hours=1)
+                next_reminder = next_training - timedelta(minutes=reminder_minutes_before)
                 if next_reminder <= now:
                     next_training += timedelta(days=7)
-                    next_reminder = next_training - timedelta(hours=1)
+                    next_reminder = next_training - timedelta(minutes=reminder_minutes_before)
             
                 wait_seconds = (next_reminder - now).total_seconds()
                 await asyncio.sleep(wait_seconds)
@@ -186,8 +195,17 @@ class NotificationService:
                     if user:
                         i18n.set_user_language(telegram_id, user.language_code)
             
-                # Send localized reminder
-                reminder_text = i18n.get("training_reminder", telegram_id)
+                # Format reminder time for message
+                if reminder_minutes_before < 60:
+                    reminder_text = i18n.get("training_reminder_minutes", telegram_id, minutes=reminder_minutes_before)
+                else:
+                    hours = reminder_minutes_before // 60
+                    remaining_minutes = reminder_minutes_before % 60
+                    if remaining_minutes == 0:
+                        reminder_text = i18n.get("training_reminder_hours", telegram_id, hours=hours)
+                    else:
+                        reminder_text = i18n.get("training_reminder_hours_minutes", telegram_id, hours=hours, minutes=remaining_minutes)
+                
                 await self.bot.send_message(telegram_id, reminder_text)
             
             except asyncio.CancelledError:
