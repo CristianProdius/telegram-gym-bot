@@ -149,7 +149,7 @@ We welcome contributions! Please see our [GitHub Workflow Guide](docs/GITHUB_WOR
 | Dev3 | Progress Charts | 🚧 In Progress |
 | Dev4 | Social Features | 📋 Planned |
 | Dev5 | Rest Timers | ✅ Implemented |
-| Dev6 | Nutrition Tracking | 📋 Planned |
+| Dev6 | Nutrition Tracking | ✅ Implemented |
 
 ## 📄 License
 

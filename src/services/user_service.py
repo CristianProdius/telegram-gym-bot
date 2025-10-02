@@ -15,7 +15,7 @@ class UserService:
         stmt = select(User).where(User.telegram_id == telegram_id)
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
-
+  
     async def get_or_create_user(
         self,
         session: AsyncSession,
@@ -83,7 +83,7 @@ class UserService:
         if user:
             user.language_code = language_code
             await session.commit()
-
+    
     async def update_last_active(self, session: AsyncSession, telegram_id: int):
         """Update user's last active timestamp"""
         user = await self.get_user(session, telegram_id)
@@ -122,3 +122,7 @@ class UserService:
             "member_since": user.created_at.strftime("%B %Y"),
             "last_active": user.last_active.strftime("%Y-%m-%d %H:%M")
         }
+    
+    async def get_user_by_telegram_id(self, session: AsyncSession, telegram_id: int) -> Optional[User]:
+        """Get user by telegram ID (alias for get_user for clarity)"""
+        return await self.get_user(session, telegram_id)

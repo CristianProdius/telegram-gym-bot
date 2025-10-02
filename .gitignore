@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+/main/.venv/
+=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -207,3 +210,4 @@ yarn.lock
 *.swp
 *.swo
 *~
+>>>>>>> 77fb251fb7abb4991f6ba7d0a7a472c30ef7d633

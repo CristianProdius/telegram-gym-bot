@@ -24,6 +24,8 @@ class Config:
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
 
+    USDA_API_KEY: str = os.getenv("USDA_API_KEY", "")
+
     # Rate limiting
     MAX_CONCURRENT_USERS: int = int(os.getenv("MAX_CONCURRENT_USERS", "100"))
     RATE_LIMIT_MESSAGES_PER_MINUTE: int = int(os.getenv("RATE_LIMIT_MESSAGES_PER_MINUTE", "20"))
@@ -43,7 +45,7 @@ class Config:
     ]
 
     # Feature flags
-    ENABLE_NUTRITION: bool = os.getenv("ENABLE_NUTRITION", "False").lower() == "true"
+    ENABLE_NUTRITION: bool = os.getenv("ENABLE_NUTRITION", "True").lower() == "true"
     ENABLE_SOCIAL: bool = os.getenv("ENABLE_SOCIAL", "False").lower() == "true"
     ENABLE_AI_RECOMMENDATIONS: bool = os.getenv("ENABLE_AI_RECOMMENDATIONS", "False").lower() == "true"
 
@@ -64,6 +66,9 @@ class Config:
 
         if cls.IS_PRODUCTION and not cls.WEBHOOK_URL:
             logger.warning("Running in production without webhook URL")
+
+        if cls.ENABLE_NUTRITION and not cls.USDA_API_KEY:
+            logger.warning("Nutrition feature enabled but USDA_API_KEY is not set")
 
         return True
 
