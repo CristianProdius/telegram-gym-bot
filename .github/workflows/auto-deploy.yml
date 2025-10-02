@@ -10,32 +10,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
     - name: Deploy to VPS via SSH
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.VPS_HOST }}
         username: ${{ secrets.VPS_USER }}
         key: ${{ secrets.VPS_SSH_KEY }}
-        port: ${{ secrets.VPS_PORT || 22 }}
+        port: 22
         script: |
-          cd /home/deploy/telegram-gym-bot
+          echo "Starting deployment..."
+
+          # Navigate to project directory
+          cd /home/deploy/telegram-gym-bot || exit 1
 
           # Pull latest code
-          git pull origin main
+          echo "Pulling latest code from GitHub..."
+          git pull origin main || exit 1
+
+          # Make scripts executable
+          chmod +x scripts/deploy.sh
 
           # Run deployment script
+          echo "Running deployment script..."
           ./scripts/deploy.sh
 
-    - name: Send Telegram notification
-      if: always()
-      uses: appleboy/telegram-action@master
-      with:
-        to: ${{ secrets.TELEGRAM_CHAT_ID }}
-        token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-        message: |
-          🚀 Deployment Status: ${{ job.status }}
-
-          Commit: ${{ github.event.head_commit.message }}
-          Author: ${{ github.actor }}
-
-          View bot: @profiusgymbot
+          echo "Deployment completed!"
