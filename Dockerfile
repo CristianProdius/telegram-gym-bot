@@ -36,9 +36,9 @@ WORKDIR /app
 COPY --from=builder /root/.local /root/.local
 
 # Copy application code
-COPY src/ ./src/
-COPY run.py .
-COPY .env.example .
+COPY . .
+# Remove unnecessary files
+RUN rm -rf .git .github tests docker __pycache__
 
 # Create necessary directories
 RUN mkdir -p logs data

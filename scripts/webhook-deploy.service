@@ -1,0 +1,18 @@
+[Unit]
+Description=GitHub Webhook Deploy Server for Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=deploy
+Group=deploy
+WorkingDirectory=/home/deploy/telegram-gym-bot
+Environment="WEBHOOK_SECRET=your-secret-here"
+ExecStart=/usr/bin/python3 /home/deploy/telegram-gym-bot/scripts/webhook-server.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
